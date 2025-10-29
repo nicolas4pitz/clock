@@ -8,43 +8,44 @@ function formatTime(seconds) {
 }
 
 function App() {
+  //constantes pra limitar o relogio
     const DEFAULT_BREAK = 5;
     const DEFAULT_SESSION = 25;
     const MIN_LENGTH = 1;
     const MAX_LENGTH = 60;
 
-    const [breakLength, setBreakLength] = useState(DEFAULT_BREAK); // minutes
-    const [sessionLength, setSessionLength] = useState(DEFAULT_SESSION); // minutes
-    const [timeLeft, setTimeLeft] = useState(DEFAULT_SESSION * 60); // seconds
+    const [breakLength, setBreakLength] = useState(DEFAULT_BREAK);
+    const [sessionLength, setSessionLength] = useState(DEFAULT_SESSION); 
+    const [timeLeft, setTimeLeft] = useState(DEFAULT_SESSION * 60); 
     const [isRunning, setIsRunning] = useState(false);
-    const [mode, setMode] = useState("Session"); // "Session" or "Break"
+    const [mode, setMode] = useState("Session"); 
 
     const intervalRef = useRef(null);
     const beepRef = useRef(null);
 
-    // Keep timeLeft in sync if sessionLength changes while NOT running
+    
     useEffect(() => {
         if (!isRunning && mode === "Session") {
             setTimeLeft(sessionLength * 60);
         }
-    }, [sessionLength, mode]); // removed isRunning from deps to avoid running on pause
+    }, [sessionLength, mode]); 
 
-    // Keep timeLeft in sync if breakLength changes while NOT running and mode is Break
+    
     useEffect(() => {
         if (!isRunning && mode === "Break") {
             setTimeLeft(breakLength * 60);
         }
-    }, [breakLength, mode]); // removed isRunning from deps to avoid running on pause
+    }, [breakLength, mode]); 
 
-    // Interval tick
     useEffect(() => {
         if (isRunning) {
+          //timer++
             intervalRef.current = setInterval(() => {
                 setTimeLeft(prev => {
                     if (prev > 0) {
                         return prev - 1;
                     }
-                    // prev === 0 -> trigger switch and beep
+                  
                     if (beepRef.current) {
                         beepRef.current.currentTime = 0;
                         beepRef.current.play().catch(() => {});
@@ -73,18 +74,15 @@ function App() {
     }, [isRunning, mode, breakLength, sessionLength]);
 
     const handleReset = () => {
-        // stop timer
         setIsRunning(false);
         if (intervalRef.current) {
             clearInterval(intervalRef.current);
             intervalRef.current = null;
         }
-        // reset values
         setBreakLength(DEFAULT_BREAK);
         setSessionLength(DEFAULT_SESSION);
         setMode("Session");
         setTimeLeft(DEFAULT_SESSION * 60);
-        // reset audio
         if (beepRef.current) {
             beepRef.current.pause();
             beepRef.current.currentTime = 0;
@@ -93,14 +91,12 @@ function App() {
 
     const toggleStartStop = () => {
         if (isRunning) {
-            // Pause: clear the running interval and keep timeLeft as-is
             if (intervalRef.current) {
                 clearInterval(intervalRef.current);
                 intervalRef.current = null;
             }
             setIsRunning(false);
         } else {
-            // Start/resume: set running true; interval effect will create interval
             setIsRunning(true);
         }
     };
@@ -183,7 +179,7 @@ function App() {
                 </div>
             </div>
 
-            {/* audio beep - must be id="beep" and >= 1s; using a public domain alarm sound */}
+            {}
             <audio
                 id="beep"
                 ref={beepRef}
