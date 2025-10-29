@@ -1,4 +1,4 @@
-# Drum Machine
+# Pomodoro Clock
 
 A simple Clock 25 + 5
 
